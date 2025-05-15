@@ -1,0 +1,1 @@
+# calculadoraautomaticaifood-firedelivery
