@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Lucro iFood</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label, select, input {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #ff4d00;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .resultado {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 18px;
+      text-align: center;
+      border: 1px solid #ccc;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Calculadora de Lucro - iFood</h2>
+
+  <label for="valor">Valor do pedido (R$):</label>
+  <input type="number" id="valor" placeholder="Ex: 100" step="0.01" />
+
+  <label for="plano">Escolha o tipo de entrega:</label>
+  <select id="plano">
+    <option value="0.2769">Entrega Parceira iFood (27,69%)</option>
+    <option value="0.1669">Entrega Própria (16,69%)</option>
+  </select>
+
+  <label for="descontoPromocao">Desconto oferecido em promoção (R$):</label>
+  <input type="number" id="descontoPromocao" placeholder="Ex: 10.00" step="0.01" />
+
+  <label for="taxaGratis">Você oferece taxa grátis?</label>
+  <select id="taxaGratis" onchange="toggleTaxaGratisInput()">
+    <option value="nao">Não</option>
+    <option value="sim">Sim</option>
+  </select>
+
+  <div id="valorTaxaGratisContainer" class="hidden">
+    <label for="valorTaxaGratis">Valor da taxa grátis oferecida (R$):</label>
+    <input type="number" id="valorTaxaGratis" placeholder="Ex: 5.00" step="0.01" />
+  </div>
+
+  <label for="custoPrato">Custo de produção do prato (R$):</label>
+  <input type="number" id="custoPrato" placeholder="Ex: 20.00" step="0.01" />
+
+  <button onclick="calcular()">Calcular Lucro</button>
+
+  <div class="resultado" id="resultado"></div>
+
+  <script>
+    function toggleTaxaGratisInput() {
+      const select = document.getElementById("taxaGratis");
+      const container = document.getElementById("valorTaxaGratisContainer");
+      container.classList.toggle("hidden", select.value !== "sim");
+    }
+
+    function calcular() {
+      const valorPedido = parseFloat(document.getElementById("valor").value);
+      const taxaIFood = parseFloat(document.getElementById("plano").value);
+      const descontoPromocao = parseFloat(document.getElementById("descontoPromocao").value) || 0;
+      const custoPrato = parseFloat(document.getElementById("custoPrato").value) || 0;
+
+      const ofereceTaxaGratis = document.getElementById("taxaGratis").value === "sim";
+      const valorTaxaGratis = ofereceTaxaGratis
+        ? parseFloat(document.getElementById("valorTaxaGratis").value) || 0
+        : 0;
+
+      if (isNaN(valorPedido) || valorPedido <= 0) {
+        document.getElementById("resultado").innerText = "Digite um valor de pedido válido.";
+        return;
+      }
+
+      const taxaIFoodReal = valorPedido * taxaIFood;
+      const valorLiquido = valorPedido - taxaIFoodReal - descontoPromocao - valorTaxaGratis;
+      const lucroFinal = Math.max(valorLiquido - custoPrato, 0);
+
+      document.getElementById("resultado").innerHTML =
+        `
+        <p>📦 Valor do pedido: R$ ${valorPedido.toFixed(2)}</p>
+        <p>🔻 Taxa iFood (${(taxaIFood * 100).toFixed(2)}%): R$ ${taxaIFoodReal.toFixed(2)}</p>
+        <p>🎯 Desconto em promoção: R$ ${descontoPromocao.toFixed(2)}</p>
+        <p>🚚 Taxa grátis oferecida: R$ ${valorTaxaGratis.toFixed(2)}</p>
+        <p>🍽️ Custo do prato: R$ ${custoPrato.toFixed(2)}</p>
+        <hr>
+        <p>💰 <strong>Lucro final líquido: R$ ${lucroFinal.toFixed(2)}</strong></p>
+        `;
+    }
+  </script>
+
+</body>
+</html>
